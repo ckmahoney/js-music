@@ -1,0 +1,42 @@
+<script>
+const ctx = new AudioContext()
+, bass = ctx.createOscillator()
+, alto = ctx.createOscillator()
+, lead = ctx.createOscillator()
+, cps = 8 // Cycles Per Second (basically BPM / 60)
+, harmonicSpeed = Math.pow(2, 0) // higher powers of 2 are slower harmonic motion
+, root = 32 * 2; // the fundamental frequency of the song
+
+let ref = root * 2; // 
+
+lead.type = "square"; // make it a little prettier
+
+[bass, alto, lead].forEach(osc => { 
+  osc.connect(ctx.destination); 
+  osc.start()
+})
+
+bass.frequency.value = ref * 2;
+alto.frequency.value = ref * 2 * 1.5;
+lead.frequency.value = ref * 4;
+
+let fundamentals = [1,2,3,4,5]
+, degrees = [7, 8, 9, 10, 11, 12]
+, notes = degrees.map(x => x * ref)
+, randFrom = (items) => items[Math.floor(Math.random()*items.length)]
+, melody = () => 
+  setInterval(() => {
+    lead.frequency.setValueAtTime(randFrom(notes), 0);
+  }, (1/cps) * 1000)
+, harmony = () => 
+  setInterval(() => {
+    ref = root * randFrom(fundamentals) / 2
+    // notes = degrees.map(x => x * ref) // uncomment to change notes with the harmony; for better music this requires selecting different degrees
+    bass.frequency.setValueAtTime(ref * 2, 0);
+    alto.frequency.setValueAtTime(ref * 2 * 1.5, 0);
+  }, harmonicSpeed * (1/cps) * 1000)
+
+melody() 
+harmony()
+
+</script>
